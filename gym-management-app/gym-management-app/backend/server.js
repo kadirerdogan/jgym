@@ -20,7 +20,9 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/plans', require('./routes/plans'));
 app.use('/api/facilities', require('./routes/facilities'));
 app.use('/api/users', require('./routes/users'));
-app.use('/api/trainer-profiles', require('./routes/trainerProfiles')); // Add Trainer Profile routes
+app.use('/api/trainer-profiles', require('./routes/trainerProfiles'));
+app.use('/api/classtypes', require('./routes/classTypes')); // Add ClassType routes
+app.use('/api/scheduledclasses', require('./routes/scheduledClasses')); // Add ScheduledClass routes
 
 // Database Connection
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/gym_management_db_default';

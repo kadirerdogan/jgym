@@ -16,13 +16,17 @@ import ViewFacilitiesPage from './components/facilities/ViewFacilitiesPage';
 import UserListPage from './components/admin/users/UserListPage';
 import UserEditForm from './components/admin/users/UserEditForm';
 import ProfilePage from './components/user/ProfilePage';
-import TrainerRoute from './components/routing/TrainerRoute'; // Import TrainerRoute
-import TrainerDashboardPage from './components/trainer/TrainerDashboardPage'; // Import TrainerDashboardPage
-import TrainerProfileForm from './components/trainer/TrainerProfileForm'; // Import TrainerProfileForm
+import TrainerRoute from './components/routing/TrainerRoute';
+import TrainerDashboardPage from './components/trainer/TrainerDashboardPage';
+import TrainerProfileForm from './components/trainer/TrainerProfileForm';
+import ClassTypeListPage from './components/admin/classTypes/ClassTypeListPage';
+import ClassTypeForm from './components/admin/classTypes/ClassTypeForm';
+import ScheduledClassListPage from './components/admin/scheduledClasses/ScheduledClassListPage'; // Import ScheduledClassListPage
+import ScheduledClassForm from './components/admin/scheduledClasses/ScheduledClassForm'; // Import ScheduledClassForm
 
-import { Link as RouterLink } from 'react-router-dom'; // Ensure RouterLink is available for dashboards
-import { Paper, List, ListItem, ListItemText, ListItemIcon } from '@mui/material'; // For dashboard links
-import { Settings, People, FitnessCenter, Description } from '@mui/icons-material'; // Example icons
+import { Link as RouterLink } from 'react-router-dom';
+import { Paper, List, ListItem, ListItemText, ListItemIcon } from '@mui/material';
+import { Settings, People, FitnessCenter, Description, Class as ClassIcon, Schedule as ScheduleIcon } from '@mui/icons-material'; // Added ScheduleIcon
 
 // Placeholder Components (can be moved to separate files later)
 function HomePage() {
@@ -94,6 +98,14 @@ function AdminDashboardPage() {
           <ListItem button component={RouterLink} to="/admin/facilities">
             <ListItemIcon><FitnessCenter /></ListItemIcon>
             <ListItemText primary="Manage Facilities" />
+          </ListItem>
+          <ListItem button component={RouterLink} to="/admin/classtypes">
+            <ListItemIcon><ClassIcon /></ListItemIcon>
+            <ListItemText primary="Manage Class Types" />
+          </ListItem>
+          <ListItem button component={RouterLink} to="/admin/scheduledclasses">
+            <ListItemIcon><ScheduleIcon /></ListItemIcon>
+            <ListItemText primary="Manage Class Schedules" />
           </ListItem>
           {/* Add more admin links here */}
         </List>
@@ -188,6 +200,12 @@ function App() {
               <Route path="facilities/edit/:facilityId" element={<FacilityForm />} />
               <Route path="users" element={<UserListPage />} />
               <Route path="users/edit/:userId" element={<UserEditForm />} />
+              <Route path="classtypes" element={<ClassTypeListPage />} />
+              <Route path="classtypes/new" element={<ClassTypeForm />} />
+              <Route path="classtypes/edit/:classTypeId" element={<ClassTypeForm />} />
+              <Route path="scheduledclasses" element={<ScheduledClassListPage />} />
+              <Route path="scheduledclasses/new" element={<ScheduledClassForm />} />
+              <Route path="scheduledclasses/edit/:scheduledClassId" element={<ScheduledClassForm />} />
             </Route>
 
             {/* Trainer Protected Routes */}
