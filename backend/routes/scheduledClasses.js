@@ -318,9 +318,123 @@ router.delete('/:id', protect, authorize('admin'), async (req, res) => {
   }
 });
 
-// --- Attendee Management (Booking/Unbooking) - To be implemented in a later step ---
-// Example placeholder for booking a class by a member:
-// router.post('/:id/book', protect, authorize('member'), async (req, res) => { ... });
-// router.delete('/:id/unbook', protect, authorize('member'), async (req, res) => { ... });
+// --- Attendee Management (Booking/Unbooking) ---
+
+// @route   POST api/scheduledclasses/:id/book
+// @desc    Book a spot in a scheduled class
+// @access  Private (Member only)
+router.post('/:id/book', protect, authorize('member'), async (req, res) => {
+  try {
+    const scheduledClass = await ScheduledClass.findById(req.params.id);
+
+    if (!scheduledClass) {
+      return res.status(404).json({ msg: 'Scheduled class not found' });
+    }
+
+    // Check class status
+    if (scheduledClass.status === 'Cancelled') {
+      return res.status(400).json({ msg: 'Cannot book a cancelled class.' });
+    }
+    if (scheduledClass.status === 'Completed') {
+      return res.status(400).json({ msg: 'Cannot book a completed class.' });
+    }
+    if (new Date(scheduledClass.startTime) < new Date()) {
+        return res.status(400).json({ msg: 'Cannot book a class that has already started or passed.' });
+    }
+
+    // Check if user is already booked
+    if (scheduledClass.attendees.includes(req.user.id)) {
+      return res.status(400).json({ msg: 'Already booked for this class.' });
+    }
+
+    // Check for capacity
+    if (scheduledClass.attendees.length >= scheduledClass.capacity) {
+      // Update status to 'Full' if it was 'Scheduled' before this attempt
+      if (scheduledClass.status === 'Scheduled') {
+        scheduledClass.status = 'Full';
+        // We save this status change even if the current booking fails,
+        // as it's a correct reflection of the state.
+        await scheduledClass.save();
+      }
+      return res.status(400).json({ msg: 'Class is full.' });
+    }
+
+    scheduledClass.attendees.push(req.user.id);
+
+    // Update status to 'Full' if capacity is now met
+    if (scheduledClass.attendees.length === scheduledClass.capacity) {
+      scheduledClass.status = 'Full';
+    }
+
+    await scheduledClass.save();
+
+    const populatedClass = await ScheduledClass.findById(scheduledClass._id)
+        .populate('classType', 'name defaultDurationMinutes')
+        .populate('trainer', 'firstName lastName username')
+        .populate('facility', 'name type')
+        .populate('attendees', 'username firstName lastName'); // Populate attendees for the response
+
+    res.json({ msg: 'Successfully booked class.', class: populatedClass });
+
+  } catch (err) {
+    console.error(err.message);
+    if (err.kind === 'ObjectId') {
+      return res.status(404).json({ msg: 'Scheduled class not found (invalid ID format)' });
+    }
+    res.status(500).send('Server Error');
+  }
+});
+
+// @route   DELETE api/scheduledclasses/:id/unbook
+// @desc    Cancel a booking for a scheduled class
+// @access  Private (Member only - owner of booking)
+router.delete('/:id/unbook', protect, authorize('member'), async (req, res) => {
+  try {
+    const scheduledClass = await ScheduledClass.findById(req.params.id);
+
+    if (!scheduledClass) {
+      return res.status(404).json({ msg: 'Scheduled class not found' });
+    }
+
+    if (scheduledClass.status === 'Cancelled' || scheduledClass.status === 'Completed') {
+        return res.status(400).json({ msg: `Cannot unbook from a ${scheduledClass.status.toLowerCase()} class.` });
+    }
+    if (new Date(scheduledClass.startTime) < new Date() && scheduledClass.status !== 'Completed') {
+        // If class has started but not yet marked completed, prevent unbooking
+        // For already completed classes, the check above handles it.
+        return res.status(400).json({ msg: 'Cannot unbook from a class that has already started or passed.' });
+    }
+
+    const attendeeIndex = scheduledClass.attendees.indexOf(req.user.id);
+
+    if (attendeeIndex === -1) {
+      return res.status(400).json({ msg: 'You are not booked for this class.' });
+    }
+
+    scheduledClass.attendees.splice(attendeeIndex, 1);
+
+    // Update status if class was 'Full' and now has space
+    if (scheduledClass.status === 'Full' && scheduledClass.attendees.length < scheduledClass.capacity) {
+      scheduledClass.status = 'Scheduled';
+    }
+
+    await scheduledClass.save();
+
+    const populatedClass = await ScheduledClass.findById(scheduledClass._id)
+        .populate('classType', 'name defaultDurationMinutes')
+        .populate('trainer', 'firstName lastName username')
+        .populate('facility', 'name type')
+        .populate('attendees', 'username firstName lastName');
+
+    res.json({ msg: 'Successfully unbooked from class.', class: populatedClass });
+
+  } catch (err) {
+    console.error(err.message);
+    if (err.kind === 'ObjectId') {
+      return res.status(404).json({ msg: 'Scheduled class not found (invalid ID format)' });
+    }
+    res.status(500).send('Server Error');
+  }
+});
 
 module.exports = router;

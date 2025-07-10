@@ -25,10 +25,12 @@ import ScheduledClassListPage from './components/admin/scheduledClasses/Schedule
 import ScheduledClassForm from './components/admin/scheduledClasses/ScheduledClassForm';
 import FacilityAvailabilityPage from './components/facilities/FacilityAvailabilityPage'; // Import FacilityAvailabilityPage
 import MyBookingsPage from './components/user/MyBookingsPage'; // Import MyBookingsPage
+import ViewScheduledClassesPage from './components/classes/ViewScheduledClassesPage'; // Import for class booking
+import ScheduledClassDetailsPage from './components/classes/ScheduledClassDetailsPage'; // Import for class booking
 
 import { Link as RouterLink } from 'react-router-dom';
 import { Paper, List, ListItem, ListItemText, ListItemIcon } from '@mui/material';
-import { Settings, People, FitnessCenter, Description, Class as ClassIcon, Schedule as ScheduleIcon, BookOnline } from '@mui/icons-material'; // Added BookOnline for MyBookings
+import { Settings, People, FitnessCenter, Description, Class as ClassIcon, Schedule as ScheduleIcon, BookOnline, EventAvailable } from '@mui/icons-material'; // Added BookOnline for MyBookings, EventAvailable for classes
 
 // Placeholder Components (can be moved to separate files later)
 function HomePage() {
@@ -76,6 +78,10 @@ function DashboardPage() { // Member Dashboard
            <ListItem button component={RouterLink} to="/my-bookings">
             <ListItemIcon><BookOnline /></ListItemIcon>
             <ListItemText primary="My Facility Bookings" />
+          </ListItem>
+          <ListItem button component={RouterLink} to="/classes">
+            <ListItemIcon><EventAvailable /></ListItemIcon>
+            <ListItemText primary="View & Book Classes" />
           </ListItem>
           {/* Add more member-specific links here */}
         </List>
@@ -159,6 +165,7 @@ function App() {
             <Button color="inherit" component={Link} to="/">Home</Button>
             <Button color="inherit" component={Link} to="/plans">View Plans</Button>
             <Button color="inherit" component={Link} to="/facilities">View Facilities</Button>
+            <Button color="inherit" component={Link} to="/classes">View Classes</Button>
             {authState.isAuthenticated ? (
               <>
                 <Button color="inherit" component={Link} to="/dashboard">Dashboard</Button>
@@ -199,6 +206,14 @@ function App() {
             </Route>
             <Route path="/my-bookings" element={<PrivateRoute />}>
               <Route index element={<MyBookingsPage />} />
+            </Route>
+
+            {/* Class Booking Routes for Members */}
+            <Route path="/classes" element={<PrivateRoute />}> {/* Classes list should be private for members to book */}
+              <Route index element={<ViewScheduledClassesPage />} />
+            </Route>
+            <Route path="/classes/:id" element={<PrivateRoute />}> {/* Class details and booking also private */}
+              <Route index element={<ScheduledClassDetailsPage />} />
             </Route>
 
             {/* Admin Protected Routes */}
