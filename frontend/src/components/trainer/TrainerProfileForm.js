@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import {
   Container, Box, Typography, TextField, Button, CircularProgress, Alert,
-  Paper, Grid, Chip, IconButton, Stack
+  Paper, Grid, Chip, IconButton, Select, MenuItem, InputLabel, FormControl // Stack removed, Select, MenuItem etc added for availability
 } from '@mui/material';
 import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
 import AuthContext from '../../context/AuthContext';
@@ -12,8 +12,8 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
 const DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 function TrainerProfileForm() {
-  const navigate = useNavigate();
-  const { authState, login } = useContext(AuthContext); // login to potentially update user info in context if needed
+  // const navigate = useNavigate(); // Was unused
+  const { authState /*, login*/ } = useContext(AuthContext); // login was unused
 
   const [formData, setFormData] = useState({
     specializations: [], // Array of strings
@@ -119,13 +119,14 @@ function TrainerProfileForm() {
         },
       };
       // POST will create or update based on backend logic
-      const response = await axios.post(`${API_URL}/trainer-profiles/me`, formData, config);
+      // const response = await axios.post(`${API_URL}/trainer-profiles/me`, formData, config); // response was unused
+      await axios.post(`${API_URL}/trainer-profiles/me`, formData, config);
       setFormSuccess('Trainer profile saved successfully!');
       // Optionally update authState if trainer profile details are stored there (not currently the case)
-      // login(authState.token, { ...authState.user, trainerProfile: response.data });
+      // login(authState.token, { ...authState.user, trainerProfile: response.data }); // login was commented out as unused
 
       // Navigate or give feedback
-      // setTimeout(() => navigate('/dashboard'), 1500); // Or a specific trainer dashboard
+      // setTimeout(() => navigate('/dashboard'), 1500); // navigate was commented out as unused
     } catch (err) {
       console.error("Error saving trainer profile:", err.response || err);
       setFormError(err.response?.data?.msg || 'Failed to save profile.');

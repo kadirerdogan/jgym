@@ -23,7 +23,7 @@ import { useContext } from 'react'; // Import useContext
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
 
 function RegisterPage() {
-  const { authState } = useContext(AuthContext); // Get authState, can be used to check if already logged in
+  // const { authState } = useContext(AuthContext); // authState was unused
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -63,7 +63,9 @@ function RegisterPage() {
         },
       };
       const body = JSON.stringify({ username, email, password, role });
-      const res = await axios.post(`${API_URL}/auth/register`, body, config);
+      // const res = await axios.post(`${API_URL}/auth/register`, body, config); // res was unused
+      await axios.post(`${API_URL}/auth/register`, body, config);
+
 
       // Assuming the backend returns a token and user info
       // For now, just show success and redirect to login

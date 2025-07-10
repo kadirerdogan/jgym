@@ -3,8 +3,9 @@ import axios from 'axios';
 import {
   Container, Box, Typography, CircularProgress, Alert,
   List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, Paper, Divider, Chip, Tooltip
-} from '@mui/material'; // Added Tooltip
-import { DeleteOutline as CancelIcon, EventAvailable, History, FitnessCenter as FacilityIcon, Class as ClassIconMUI } from '@mui/icons-material'; // Added more icons
+  // Button was removed from here in a previous step, but the warning was for a different Button import (likely a typo in the warning or it was already fixed)
+} from '@mui/material';
+import { DeleteOutline as CancelIcon, EventAvailable, History, FitnessCenter as FacilityIcon, Class as ClassIconMUI } from '@mui/icons-material';
 import AuthContext from '../../context/AuthContext';
 import { format, isPast, parseISO } from 'date-fns'; // Added parseISO
 

@@ -14,7 +14,7 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
 
 function FacilityAvailabilityPage() {
   const { facilityId } = useParams();
-  const navigate = useNavigate();
+  // const navigate = useNavigate(); // Was unused
   const { authState } = useContext(AuthContext);
 
   const [facility, setFacility] = useState(null);
@@ -100,7 +100,8 @@ function FacilityAvailabilityPage() {
         // notes: 'My booking notes' // Optional: Add a field for notes if desired
       };
       const config = { headers: { Authorization: `Bearer ${authState.token}` } };
-      const response = await axios.post(`${API_URL}/bookings`, payload, config);
+      // const response = await axios.post(`${API_URL}/bookings`, payload, config); // response was unused
+      await axios.post(`${API_URL}/bookings`, payload, config);
       setBookingSuccess(`Booking confirmed for ${format(selectedSlot.startTime, 'Pp')} to ${format(selectedSlot.endTime, 'p')}!`);
       setSelectedSlot(null); // Clear selection
       // Re-fetch slots to show updated availability

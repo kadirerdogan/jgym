@@ -1,5 +1,6 @@
 import React, { useContext } from 'react'; // Import useContext
-import { BrowserRouter as Router, Route, Routes, Link, useNavigate } from 'react-router-dom'; // Import useNavigate
+// Router (BrowserRouter) is expected to be in index.js or a higher component
+import { Route, Routes, Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 import { AppBar, Toolbar, Typography, Button, Container, Box, CircularProgress } from '@mui/material'; // Import CircularProgress
 
 import AuthContext from './context/AuthContext'; // Import AuthContext
