@@ -179,7 +179,7 @@ function ScheduledClassForm() {
 
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <LocalizationProvider dateAdapter={AdapterDateFnsV3}>
         <Paper elevation={3} sx={{ p: {xs:2, md:4} }}>
           <Typography variant="h4" component="h1" gutterBottom>
             {isEditMode ? 'Edit Scheduled Class' : 'Schedule New Class'}

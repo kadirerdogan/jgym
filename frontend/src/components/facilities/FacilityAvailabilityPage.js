@@ -131,7 +131,7 @@ function FacilityAvailabilityPage() {
 
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <LocalizationProvider dateAdapter={AdapterDateFnsV3}>
         <Paper elevation={3} sx={{ p: { xs: 2, md: 4 } }}>
           <Typography variant="h4" component="h1" gutterBottom color="primary">
             {facility.name} - Book a Slot
