@@ -56,13 +56,19 @@ router.post('/register', async (req, res) => {
 // @access  Public
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
+  console.log(`[AUTH_LOGIN] Attempting login for email: ${email}`);
+  console.log(`[AUTH_LOGIN] MONGO_URI: ${process.env.MONGO_URI ? process.env.MONGO_URI.substring(0,30) + '...' : 'Not Set'}`); // Log part of URI or if not set
 
   try {
+    console.log(`[AUTH_LOGIN] Searching for user with email: ${email}`);
     // Check if user exists
     const user = await User.findOne({ email }).select('+password'); // Explicitly select password
+
     if (!user) {
+      console.warn(`[AUTH_LOGIN] User not found in DB for email: ${email}`);
       return res.status(400).json({ msg: 'Invalid credentials (user not found)' });
     }
+    console.log(`[AUTH_LOGIN] User found for email: ${email}, User ID: ${user._id}. Proceeding to password check.`);
 
     // Compare password
     const isMatch = await user.matchPassword(password);
