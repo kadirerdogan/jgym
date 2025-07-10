@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Link } from 'react-router-dom';
-import { AuthContext } from '../../context/AuthContext'; // To customize view based on auth
-import { Alert, Container, Row, Col, Card, Button, Spinner, Typography, ListGroup } from '@mui/material'; // Assuming Material-UI
+import { Link as RouterLink } from 'react-router-dom'; // Renamed to avoid conflict if MUI Link is used
+import AuthContext from '../../context/AuthContext';
+import {
+    Alert, Container, Card, Button, Typography, CircularProgress, Grid,
+    CardContent, CardActions, List, ListItem, ListItemText, Divider
+} from '@mui/material'; // Replaced Spinner, Row, Col, ListGroup; Added CardContent, CardActions, Grid, List components
 
 // Dummy API service functions (replace with actual API calls)
 const apiGetScheduledClasses = async () => {
@@ -51,7 +54,7 @@ const ViewScheduledClassesPage = () => {
   if (loading) {
     return (
       <Container sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-        <Spinner />
+        <CircularProgress />
       </Container>
     );
   }
@@ -68,39 +71,54 @@ const ViewScheduledClassesPage = () => {
       {classes.length === 0 ? (
         <Typography variant="subtitle1">No classes currently scheduled or available.</Typography>
       ) : (
-        <Row xs={1} md={2} lg={3} className="g-4">
+        <Grid container spacing={3}>
           {classes.map((sClass) => (
-            <Col key={sClass._id} sx={{ mb: 2 }}>
-              <Card>
-                <Card.Body>
-                  <Card.Title>{sClass.classType?.name || 'Unnamed Class'}</Card.Title>
-                  <Card.Subtitle className="mb-2 text-muted">
+            <Grid item key={sClass._id} xs={12} sm={6} md={4}>
+              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Typography variant="h5" component="div" gutterBottom>
+                    {sClass.classType?.name || 'Unnamed Class'}
+                  </Typography>
+                  <Typography sx={{ mb: 1.5 }} color="text.secondary">
                     Trainer: {sClass.trainer?.firstName} {sClass.trainer?.lastName || 'N/A'}
-                  </Card.Subtitle>
-                  <ListGroup variant="flush">
-                    <ListGroup.Item>
-                      <strong>Date & Time:</strong> {new Date(sClass.startTime).toLocaleString()} - {new Date(sClass.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </ListGroup.Item>
-                    <ListGroup.Item>
-                      <strong>Location:</strong> {sClass.facility?.name || 'N/A'}
-                    </ListGroup.Item>
-                    <ListGroup.Item>
-                      <strong>Status:</strong> {sClass.status}
-                    </ListGroup.Item>
-                    <ListGroup.Item>
-                      <strong>Availability:</strong> {sClass.capacity - sClass.attendees.length} / {sClass.capacity} spots
-                    </ListGroup.Item>
-                  </ListGroup>
-                  <Link to={`/classes/${sClass._id}`} style={{ textDecoration: 'none' }}>
-                    <Button variant="contained" color="primary" sx={{ mt: 2 }} disabled={sClass.status === 'Cancelled' || new Date(sClass.startTime) < new Date()}>
-                      View Details / Book
-                    </Button>
-                  </Link>
-                </Card.Body>
+                  </Typography>
+                  <List dense disablePadding>
+                    <ListItem disableGutters>
+                      <ListItemText
+                        primary="Date & Time:"
+                        secondary={`${new Date(sClass.startTime).toLocaleString()} - ${new Date(sClass.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
+                      />
+                    </ListItem>
+                    <ListItem disableGutters>
+                      <ListItemText primary="Location:" secondary={sClass.facility?.name || 'N/A'} />
+                    </ListItem>
+                    <ListItem disableGutters>
+                      <ListItemText primary="Status:" secondary={sClass.status} />
+                    </ListItem>
+                    <ListItem disableGutters>
+                      <ListItemText
+                        primary="Availability:"
+                        secondary={`${sClass.capacity - sClass.attendees.length} / ${sClass.capacity} spots`}
+                      />
+                    </ListItem>
+                  </List>
+                </CardContent>
+                <CardActions>
+                  <Button
+                    component={RouterLink}
+                    to={`/classes/${sClass._id}`}
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    disabled={sClass.status === 'Cancelled' || new Date(sClass.startTime) < new Date()}
+                  >
+                    View Details / Book
+                  </Button>
+                </CardActions>
               </Card>
-            </Col>
+            </Grid>
           ))}
-        </Row>
+        </Grid>
       )}
     </Container>
   );

@@ -5,10 +5,10 @@ import {
   Container, Box, Typography, CircularProgress, Alert, Paper, Grid, Button,
   List, ListItem, ListItemText, Divider, TextField, Chip
 } from '@mui/material';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
+import { AdapterDateFnsV3 } from '@mui/x-date-pickers/AdapterDateFnsV3'; // Reverted to V3 adapter
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import AuthContext from '../../context/AuthContext';
-import { format, parseISO, formatISO } from 'date-fns'; // For date formatting
+import { format, parseISO, formatISO, addMinutes } from 'date-fns'; // For date formatting, added addMinutes
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
 

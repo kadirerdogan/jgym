@@ -6,7 +6,7 @@ import {
   Paper, Grid, MenuItem, Select, InputLabel, FormControl
   // FormGroup, FormControlLabel, Checkbox were removed as they are unused (part of commented code)
 } from '@mui/material';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'; // Standard Adapter
+import { AdapterDateFnsV3 } from '@mui/x-date-pickers/AdapterDateFnsV3'; // Reverted to V3 adapter
 import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
 import AuthContext from '../../../context/AuthContext';
 import { formatISO, parseISO } from 'date-fns'; // For ISO string conversion

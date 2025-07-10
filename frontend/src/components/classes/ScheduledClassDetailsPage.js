@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../context/AuthContext';
-import { Alert, Container, Card, Button, Spinner, Typography, ListGroup, Box, Paper } from '@mui/material'; // Assuming Material-UI
+import AuthContext from '../../context/AuthContext';
+import {
+    Alert, Container, Button, Typography, Box, Paper, CircularProgress,
+    List, ListItem, ListItemText, Divider
+} from '@mui/material'; // Replaced Spinner with CircularProgress, ListGroup with List components
 
 // Dummy API service functions (replace with actual API calls)
 const apiGetScheduledClassById = async (id) => {
@@ -154,7 +157,7 @@ const ScheduledClassDetailsPage = () => {
   };
 
   if (loading) {
-    return <Container sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><Spinner /></Container>;
+    return <Container sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Container>;
   }
 
   if (error || !sClass) {
@@ -176,29 +179,65 @@ const ScheduledClassDetailsPage = () => {
         {actionError && <Alert severity="error" sx={{ mb: 2 }}>{actionError}</Alert>}
         {actionSuccess && <Alert severity="success" sx={{ mb: 2 }}>{actionSuccess}</Alert>}
 
-        <ListGroup>
-          <ListGroup.Item><strong>Description:</strong> {sClass.classType?.description || 'N/A'}</ListGroup.Item>
-          <ListGroup.Item><strong>Trainer:</strong> {sClass.trainer?.firstName} {sClass.trainer?.lastName || 'N/A'}</ListGroup.Item>
-          {sClass.trainer?.bio && <ListGroup.Item><strong>Trainer Bio:</strong> {sClass.trainer.bio}</ListGroup.Item>}
-          <ListGroup.Item><strong>Date & Time:</strong> {new Date(sClass.startTime).toLocaleString()} - {new Date(sClass.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</ListGroup.Item>
-          <ListGroup.Item><strong>Location:</strong> {sClass.facility?.name || 'N/A'} ({sClass.facility?.type || 'General Area'})</ListGroup.Item>
-          <ListGroup.Item><strong>Status:</strong> <span style={{ color: sClass.status === 'Full' ? 'red' : (sClass.status === 'Scheduled' ? 'green' : 'grey')}}>{sClass.status}</span></ListGroup.Item>
-          <ListGroup.Item><strong>Availability:</strong> {spotsAvailable > 0 ? `${spotsAvailable} / ${sClass.capacity} spots remaining` : 'No spots available'}</ListGroup.Item>
-          {sClass.classType?.requiredEquipment && sClass.classType.requiredEquipment.length > 0 && (
-            <ListGroup.Item><strong>Equipment Needed:</strong> {sClass.classType.requiredEquipment.join(', ')}</ListGroup.Item>
+        <List sx={{ width: '100%' }}>
+          <ListItem>
+            <ListItemText primary="Description" secondary={sClass.classType?.description || 'N/A'} />
+          </ListItem>
+          <Divider component="li" />
+          <ListItem>
+            <ListItemText primary="Trainer" secondary={`${sClass.trainer?.firstName || ''} ${sClass.trainer?.lastName || 'N/A'}`} />
+          </ListItem>
+          {sClass.trainer?.bio && (
+            <>
+              <Divider component="li" />
+              <ListItem>
+                <ListItemText primary="Trainer Bio" secondary={sClass.trainer.bio} />
+              </ListItem>
+            </>
           )}
-          {sClass.notes && <ListGroup.Item><strong>Notes:</strong> {sClass.notes}</ListGroup.Item>}
-        </ListGroup>
+          <Divider component="li" />
+          <ListItem>
+            <ListItemText primary="Date & Time" secondary={`${new Date(sClass.startTime).toLocaleString()} - ${new Date(sClass.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`} />
+          </ListItem>
+          <Divider component="li" />
+          <ListItem>
+            <ListItemText primary="Location" secondary={`${sClass.facility?.name || 'N/A'} (${sClass.facility?.type || 'General Area'})`} />
+          </ListItem>
+          <Divider component="li" />
+          <ListItem>
+            <ListItemText primary="Status" secondary={<Typography component="span" style={{ color: sClass.status === 'Full' ? 'red' : (sClass.status === 'Scheduled' ? 'green' : 'grey')}}>{sClass.status}</Typography>} />
+          </ListItem>
+          <Divider component="li" />
+          <ListItem>
+            <ListItemText primary="Availability" secondary={spotsAvailable > 0 ? `${spotsAvailable} / ${sClass.capacity} spots remaining` : 'No spots available'} />
+          </ListItem>
+          {sClass.classType?.requiredEquipment && sClass.classType.requiredEquipment.length > 0 && (
+            <>
+              <Divider component="li" />
+              <ListItem>
+                <ListItemText primary="Equipment Needed" secondary={sClass.classType.requiredEquipment.join(', ')} />
+              </ListItem>
+            </>
+          )}
+          {sClass.notes && (
+            <>
+              <Divider component="li" />
+              <ListItem>
+                <ListItemText primary="Notes" secondary={sClass.notes} />
+              </ListItem>
+            </>
+          )}
+        </List>
 
         <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
           {canBook && (
             <Button variant="contained" color="primary" onClick={handleBooking} disabled={isProcessing}>
-              {isProcessing ? <Spinner size="sm" /> : 'Book Class'}
+              {isProcessing ? <CircularProgress size={24} /> : 'Book Class'}
             </Button>
           )}
           {canUnbook && (
             <Button variant="outlined" color="error" onClick={handleUnbooking} disabled={isProcessing}>
-              {isProcessing ? <Spinner size="sm" /> : 'Cancel Booking'}
+              {isProcessing ? <CircularProgress size={24} /> : 'Cancel Booking'}
             </Button>
           )}
           <Button variant="outlined" onClick={() => navigate(-1)}>
