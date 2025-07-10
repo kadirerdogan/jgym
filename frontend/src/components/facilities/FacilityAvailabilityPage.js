@@ -5,7 +5,7 @@ import {
   Container, Box, Typography, CircularProgress, Alert, Paper, Grid, Button,
   List, ListItem, ListItemText, Divider, TextField, Chip
 } from '@mui/material';
-import { AdapterDateFnsV3 } from '@mui/x-date-pickers/AdapterDateFnsV3'; // Reverted to V3 adapter
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'; // Corrected: Import AdapterDateFns from the V3 path
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import AuthContext from '../../context/AuthContext';
 import { format, parseISO, formatISO, addMinutes } from 'date-fns'; // For date formatting, added addMinutes
@@ -131,7 +131,7 @@ function FacilityAvailabilityPage() {
 
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-      <LocalizationProvider dateAdapter={AdapterDateFnsV3}>
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
         <Paper elevation={3} sx={{ p: { xs: 2, md: 4 } }}>
           <Typography variant="h4" component="h1" gutterBottom color="primary">
             {facility.name} - Book a Slot

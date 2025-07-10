@@ -6,7 +6,7 @@ import {
   Paper, Grid, MenuItem, Select, InputLabel, FormControl
   // FormGroup, FormControlLabel, Checkbox were removed as they are unused (part of commented code)
 } from '@mui/material';
-import { AdapterDateFnsV3 } from '@mui/x-date-pickers/AdapterDateFnsV3'; // Reverted to V3 adapter
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'; // Corrected: Import AdapterDateFns from the V3 path
 import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
 import AuthContext from '../../../context/AuthContext';
 import { formatISO, parseISO } from 'date-fns'; // For ISO string conversion
@@ -179,7 +179,7 @@ function ScheduledClassForm() {
 
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-      <LocalizationProvider dateAdapter={AdapterDateFnsV3}>
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
         <Paper elevation={3} sx={{ p: {xs:2, md:4} }}>
           <Typography variant="h4" component="h1" gutterBottom>
             {isEditMode ? 'Edit Scheduled Class' : 'Schedule New Class'}
