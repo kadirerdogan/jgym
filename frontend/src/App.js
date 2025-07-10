@@ -1,10 +1,12 @@
-import React, { useContext } from 'react'; // Import useContext
-// Router (BrowserRouter) is expected to be in index.js or a higher component
-import { Route, Routes, Link, useNavigate } from 'react-router-dom'; // Import useNavigate
-import { AppBar, Toolbar, Typography, Button, Container, Box, CircularProgress } from '@mui/material'; // Import CircularProgress
+import React, { useContext } from 'react';
+import { Route, Routes, Link, useNavigate } from 'react-router-dom';
+import {
+  AppBar, Toolbar, Typography, Button, Container, Box, CircularProgress,
+  Paper, List, ListItemIcon, ListItemText, ListItemButton, Divider, useTheme // Added ListItemButton, Divider, useTheme
+} from '@mui/material';
 
-import AuthContext from './context/AuthContext'; // Import AuthContext
-import PrivateRoute from './components/routing/PrivateRoute'; // Import PrivateRoute
+import AuthContext from './context/AuthContext';
+import PrivateRoute from './components/routing/PrivateRoute';
 import AdminRoute from './components/routing/AdminRoute'; // Import AdminRoute
 import LoginPage from './components/auth/LoginPage';
 import RegisterPage from './components/auth/RegisterPage';
@@ -27,13 +29,18 @@ import ScheduledClassForm from './components/admin/scheduledClasses/ScheduledCla
 import FacilityAvailabilityPage from './components/facilities/FacilityAvailabilityPage'; // Import FacilityAvailabilityPage
 import MyBookingsPage from './components/user/MyBookingsPage'; // Import MyBookingsPage
 import ViewScheduledClassesPage from './components/classes/ViewScheduledClassesPage'; // Import for class booking
-import ScheduledClassDetailsPage from './components/classes/ScheduledClassDetailsPage'; // Import for class booking
+import ScheduledClassDetailsPage from './components/classes/ScheduledClassDetailsPage';
 
 import { Link as RouterLink } from 'react-router-dom';
-import { Paper, List, ListItem, ListItemText, ListItemIcon } from '@mui/material';
-import { Settings, People, FitnessCenter, Description, Class as ClassIcon, Schedule as ScheduleIcon, BookOnline, EventAvailable } from '@mui/icons-material'; // Added BookOnline for MyBookings, EventAvailable for classes
+// Paper, List, ListItem, ListItemText, ListItemIcon are already imported above if needed by other dashboards
+// For AdminDashboardPage, specific icons are imported directly.
+import {
+  Settings, People, FitnessCenter, Description, Class as ClassIcon,
+  Schedule as ScheduleIcon, BookOnline, EventAvailable, Dashboard as DashboardIcon
+} from '@mui/icons-material';
 
-// Placeholder Components (can be moved to separate files later)
+
+// HomePage Component
 function HomePage() {
   return (
     <Box sx={{ marginTop: 4, textAlign: 'center' }}>
@@ -91,43 +98,94 @@ function DashboardPage() { // Member Dashboard
   );
 }
 
-function AdminDashboardPage() {
+// Member Dashboard Component (DashboardPage)
+function DashboardPage() {
+  const theme = useTheme();
   return (
-    <Container maxWidth="md" sx={{ mt: 4 }}>
-      <Paper elevation={3} sx={{ p: 3 }}>
-        <Typography variant="h4" gutterBottom>Admin Dashboard</Typography>
-        <Typography variant="body1" paragraph>
-          Manage all aspects of the gym from here.
+    <Container maxWidth="lg" sx={{ mt: 4, py: 3, backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100], borderRadius: 2 }}>
+      <Paper elevation={4} sx={{ p: {xs: 2, md: 4} }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          <DashboardIcon color="primary" sx={{ fontSize: 40, mr: 2 }}/>
+          <Typography variant="h4" component="h1" gutterBottom sx={{flexGrow: 1}}>
+            Member Dashboard
+          </Typography>
+        </Box>
+        <Typography variant="subtitle1" color="text.secondary" paragraph>
+          Welcome to your personal dashboard. Here you can manage your profile and view gym information.
         </Typography>
-        <List>
-          <ListItem button component={RouterLink} to="/admin/users">
-            <ListItemIcon><People /></ListItemIcon>
-            <ListItemText primary="Manage Users (Members/Trainers)" />
-          </ListItem>
-          <ListItem button component={RouterLink} to="/admin/plans">
-            <ListItemIcon><Description /></ListItemIcon>
-            <ListItemText primary="Manage Membership Plans" />
-          </ListItem>
-          <ListItem button component={RouterLink} to="/admin/facilities">
-            <ListItemIcon><FitnessCenter /></ListItemIcon>
-            <ListItemText primary="Manage Facilities" />
-          </ListItem>
-          <ListItem button component={RouterLink} to="/admin/classtypes">
-            <ListItemIcon><ClassIcon /></ListItemIcon>
-            <ListItemText primary="Manage Class Types" />
-          </ListItem>
-          <ListItem button component={RouterLink} to="/admin/scheduledclasses">
-            <ListItemIcon><ScheduleIcon /></ListItemIcon>
-            <ListItemText primary="Manage Class Schedules" />
-          </ListItem>
-          {/* Add more admin links here */}
+        <Divider sx={{ my: 2 }} />
+        <List component="nav" aria-label="member dashboard navigation">
+          <ListItemButton component={RouterLink} to="/profile">
+            <ListItemIcon><Settings color="primary" /></ListItemIcon>
+            <ListItemText primary="My Profile" primaryTypographyProps={{fontWeight: 'medium'}} />
+          </ListItemButton>
+          <ListItemButton component={RouterLink} to="/my-bookings">
+            <ListItemIcon><BookOnline color="primary" /></ListItemIcon>
+            <ListItemText primary="My Bookings (Facilities & Classes)" primaryTypographyProps={{fontWeight: 'medium'}} />
+          </ListItemButton>
+          <ListItemButton component={RouterLink} to="/classes">
+            <ListItemIcon><EventAvailable color="primary" /></ListItemIcon>
+            <ListItemText primary="View & Book Classes" primaryTypographyProps={{fontWeight: 'medium'}}/>
+          </ListItemButton>
+          <ListItemButton component={RouterLink} to="/plans">
+            <ListItemIcon><Description color="primary" /></ListItemIcon>
+            <ListItemText primary="View Membership Plans" primaryTypographyProps={{fontWeight: 'medium'}}/>
+          </ListItemButton>
+          <ListItemButton component={RouterLink} to="/facilities">
+            <ListItemIcon><FitnessCenter color="primary" /></ListItemIcon>
+            <ListItemText primary="Explore Facilities" primaryTypographyProps={{fontWeight: 'medium'}}/>
+          </ListItemButton>
         </List>
       </Paper>
     </Container>
   );
 }
 
+// Admin Dashboard Component
+function AdminDashboardPage() {
+  const theme = useTheme();
+  return (
+    <Container maxWidth="lg" sx={{ mt: 4, py: 3, backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100], borderRadius: 2 }}>
+      <Paper elevation={4} sx={{ p: {xs: 2, md: 4} }}> {/* Increased padding and elevation slightly */}
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          <DashboardIcon color="secondary" sx={{ fontSize: 40, mr: 2 }}/>
+          <Typography variant="h4" component="h1" gutterBottom sx={{ color: 'secondary.main', flexGrow: 1 }}> {/* Use theme color */}
+            Admin Dashboard
+          </Typography>
+        </Box>
+        <Typography variant="subtitle1" color="text.secondary" paragraph>
+          Manage all aspects of the gym from this central hub.
+        </Typography>
+        <Divider sx={{my: 2}} />
+        <List component="nav" aria-label="admin dashboard navigation">
+          <ListItemButton component={RouterLink} to="/admin/users">
+            <ListItemIcon><People color="secondary" /></ListItemIcon>
+            <ListItemText primary="Manage Users" secondary="View, edit, and manage member and trainer accounts."/>
+          </ListItemButton>
+          <ListItemButton component={RouterLink} to="/admin/plans">
+            <ListItemIcon><Description color="secondary" /></ListItemIcon>
+            <ListItemText primary="Manage Membership Plans" secondary="Create, update, and set visibility for plans."/>
+          </ListItemButton>
+          <ListItemButton component={RouterLink} to="/admin/facilities">
+            <ListItemIcon><FitnessCenter color="secondary" /></ListItemIcon>
+            <ListItemText primary="Manage Facilities" secondary="Oversee gym areas, equipment, and their settings."/>
+          </ListItemButton>
+          <ListItemButton component={RouterLink} to="/admin/classtypes">
+            <ListItemIcon><ClassIcon color="secondary" /></ListItemIcon>
+            <ListItemText primary="Manage Class Types" secondary="Define types of classes offered (e.g., Yoga, HIIT)."/>
+          </ListItemButton>
+          <ListItemButton component={RouterLink} to="/admin/scheduledclasses">
+            <ListItemIcon><ScheduleIcon color="secondary" /></ListItemIcon>
+            <ListItemText primary="Manage Class Schedules" secondary="Schedule classes, assign trainers, and manage bookings."/>
+          </ListItemButton>
+          {/* Consider adding more direct links or summary data here in future */}
+        </List>
+      </Paper>
+    </Container>
+  );
+}
 
+// Main App Component
 function App() {
   const { authState, logout } = useContext(AuthContext);
   const navigate = useNavigate(); // For programmatic navigation after logout
