@@ -3,6 +3,7 @@ import axios from 'axios';
 import {
   Container, Box, Typography, CircularProgress, Alert, Grid, Card, CardContent, CardActions, Button, Chip
 } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom'; // Import RouterLink
 // import AuthContext from '../../context/AuthContext'; // If needed for booking actions
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
@@ -83,17 +84,17 @@ function ViewFacilitiesPage() {
                     </Typography>
                 )}
               </CardContent>
-              {/* Potential actions like "Book Slot" or "View Schedule" could go here */}
-              {/* <CardActions sx={{ justifyContent: 'center', p: 2 }}>
+              <CardActions sx={{ justifyContent: 'center', p: 2 }}>
                 <Button
                   variant="contained"
-                  color="secondary"
-                  // disabled={!authState.isAuthenticated || facility.status !== 'Available'}
-                  onClick={() => alert(`Viewing schedule for ${facility.name} - (Not Implemented)`)}
+                  color="secondary" // Using secondary color from theme
+                  component={RouterLink}
+                  to={`/facilities/${facility._id}/availability`} // Link to the new availability page
+                  disabled={facility.status !== 'Available' || !facility.isActive}
                 >
-                  View Schedule / Book
+                  View Availability & Book
                 </Button>
-              </CardActions> */}
+              </CardActions>
             </Card>
           </Grid>
         ))}

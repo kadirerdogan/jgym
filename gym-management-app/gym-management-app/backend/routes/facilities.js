@@ -82,17 +82,41 @@ router.get('/:id', async (req, res) => {
 // @desc    Update a facility
 // @access  Private (Admin only)
 router.put('/:id', protect, authorize('admin'), async (req, res) => {
-  const { name, description, type, capacity, status, notes, isActive } = req.body;
+  const {
+    name, description, type, capacity, status, notes, isActive,
+    operatingHours, bookingType, slotDurationMinutes, maxBookingLengthSlots, bookingLeadTimeDays
+  } = req.body;
+
   const facilityFields = {};
   if (name) facilityFields.name = name;
   if (description) facilityFields.description = description;
   if (type) facilityFields.type = type;
   if (capacity !== undefined) facilityFields.capacity = capacity;
   if (status) facilityFields.status = status;
-  if (notes) facilityFields.notes = notes;
+  if (notes !== undefined) facilityFields.notes = notes; // Allow empty string for notes
   if (isActive !== undefined) facilityFields.isActive = isActive;
 
+  // New booking configuration fields
+  if (operatingHours) facilityFields.operatingHours = operatingHours; // TODO: Add validation for operatingHours array structure
+  if (bookingType) facilityFields.bookingType = bookingType;
+  if (slotDurationMinutes) facilityFields.slotDurationMinutes = slotDurationMinutes;
+  if (maxBookingLengthSlots) facilityFields.maxBookingLengthSlots = maxBookingLengthSlots;
+  if (bookingLeadTimeDays !== undefined) facilityFields.bookingLeadTimeDays = bookingLeadTimeDays;
+
+
   try {
+    // Validate operatingHours structure if provided
+    if (operatingHours) {
+      if (!Array.isArray(operatingHours) || !operatingHours.every(oh =>
+        oh.dayOfWeek && typeof oh.openTime === 'string' && typeof oh.closeTime === 'string' &&
+        /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(oh.openTime) &&
+        /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(oh.closeTime) &&
+        oh.openTime < oh.closeTime
+      )) {
+        return res.status(400).json({ msg: 'Invalid operatingHours format or content. Each entry must have dayOfWeek, valid openTime (HH:MM), and closeTime (HH:MM) with openTime < closeTime.' });
+      }
+    }
+
     let facility = await Facility.findById(req.params.id);
     if (!facility) {
       return res.status(404).json({ msg: 'Facility not found' });

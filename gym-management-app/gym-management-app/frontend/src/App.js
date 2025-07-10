@@ -21,12 +21,14 @@ import TrainerDashboardPage from './components/trainer/TrainerDashboardPage';
 import TrainerProfileForm from './components/trainer/TrainerProfileForm';
 import ClassTypeListPage from './components/admin/classTypes/ClassTypeListPage';
 import ClassTypeForm from './components/admin/classTypes/ClassTypeForm';
-import ScheduledClassListPage from './components/admin/scheduledClasses/ScheduledClassListPage'; // Import ScheduledClassListPage
-import ScheduledClassForm from './components/admin/scheduledClasses/ScheduledClassForm'; // Import ScheduledClassForm
+import ScheduledClassListPage from './components/admin/scheduledClasses/ScheduledClassListPage';
+import ScheduledClassForm from './components/admin/scheduledClasses/ScheduledClassForm';
+import FacilityAvailabilityPage from './components/facilities/FacilityAvailabilityPage'; // Import FacilityAvailabilityPage
+import MyBookingsPage from './components/user/MyBookingsPage'; // Import MyBookingsPage
 
 import { Link as RouterLink } from 'react-router-dom';
 import { Paper, List, ListItem, ListItemText, ListItemIcon } from '@mui/material';
-import { Settings, People, FitnessCenter, Description, Class as ClassIcon, Schedule as ScheduleIcon } from '@mui/icons-material'; // Added ScheduleIcon
+import { Settings, People, FitnessCenter, Description, Class as ClassIcon, Schedule as ScheduleIcon, BookOnline } from '@mui/icons-material'; // Added BookOnline for MyBookings
 
 // Placeholder Components (can be moved to separate files later)
 function HomePage() {
@@ -70,6 +72,10 @@ function DashboardPage() { // Member Dashboard
           <ListItem button component={RouterLink} to="/facilities">
             <ListItemIcon><FitnessCenter /></ListItemIcon>
             <ListItemText primary="View Facilities" />
+          </ListItem>
+           <ListItem button component={RouterLink} to="/my-bookings">
+            <ListItemIcon><BookOnline /></ListItemIcon>
+            <ListItemText primary="My Facility Bookings" />
           </ListItem>
           {/* Add more member-specific links here */}
         </List>
@@ -187,6 +193,12 @@ function App() {
             </Route>
             <Route path="/profile" element={<PrivateRoute />}>
               <Route index element={<ProfilePage />} />
+            </Route>
+            <Route path="/facilities/:facilityId/availability" element={<PrivateRoute />}> {/* Protected, as booking requires login */}
+              <Route index element={<FacilityAvailabilityPage />} />
+            </Route>
+            <Route path="/my-bookings" element={<PrivateRoute />}>
+              <Route index element={<MyBookingsPage />} />
             </Route>
 
             {/* Admin Protected Routes */}
