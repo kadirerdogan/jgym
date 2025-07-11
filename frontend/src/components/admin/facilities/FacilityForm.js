@@ -4,10 +4,9 @@ import { useNavigate, useParams, Link as RouterLink } from 'react-router-dom';
 import {
   Container, Box, Typography, TextField, Button, CircularProgress, Alert,
   FormControlLabel, Checkbox, FormGroup, Paper, Grid, MenuItem, Select, InputLabel, FormControl,
-  IconButton, Divider
-  // Stack was removed as it's unused
+  IconButton, Divider, Chip // Added Chip
 } from '@mui/material';
-import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material'; // AccessTime was removed
+import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
 import AuthContext from '../../../context/AuthContext';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
