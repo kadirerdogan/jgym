@@ -62,43 +62,9 @@ function HomePage() {
 
 // LoginPage and RegisterPage are now imported
 
-function DashboardPage() { // Member Dashboard
-  return (
-    <Container maxWidth="md" sx={{ mt: 4 }}>
-      <Paper elevation={3} sx={{ p: 3 }}>
-        <Typography variant="h4" gutterBottom>Member Dashboard</Typography>
-        <Typography variant="body1" paragraph>
-          Welcome to your personal dashboard. Here you can manage your profile and view gym information.
-        </Typography>
-        <List>
-          <ListItem button component={RouterLink} to="/profile">
-            <ListItemIcon><Settings /></ListItemIcon>
-            <ListItemText primary="My Profile" />
-          </ListItem>
-          <ListItem button component={RouterLink} to="/plans">
-            <ListItemIcon><Description /></ListItemIcon>
-            <ListItemText primary="View Membership Plans" />
-          </ListItem>
-          <ListItem button component={RouterLink} to="/facilities">
-            <ListItemIcon><FitnessCenter /></ListItemIcon>
-            <ListItemText primary="View Facilities" />
-          </ListItem>
-           <ListItem button component={RouterLink} to="/my-bookings">
-            <ListItemIcon><BookOnline /></ListItemIcon>
-            <ListItemText primary="My Facility Bookings" />
-          </ListItem>
-          <ListItem button component={RouterLink} to="/classes">
-            <ListItemIcon><EventAvailable /></ListItemIcon>
-            <ListItemText primary="View & Book Classes" />
-          </ListItem>
-          {/* Add more member-specific links here */}
-        </List>
-      </Paper>
-    </Container>
-  );
-}
+// The first, older DashboardPage declaration was here and has been removed.
 
-// Member Dashboard Component (DashboardPage)
+// Member Dashboard Component (DashboardPage) - This is the enhanced version to keep.
 function DashboardPage() {
   const theme = useTheme();
   return (
