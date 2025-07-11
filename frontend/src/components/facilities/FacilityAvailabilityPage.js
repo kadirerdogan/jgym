@@ -3,19 +3,20 @@ import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Container, Box, Typography, CircularProgress, Alert, Paper, Grid, Button,
-  List, ListItem, ListItemText, Divider, TextField, Chip
+  List, ListItem, ListItemText, Divider, TextField, Chip, useTheme, ListItemButton, ListItemIcon, ListSubheader
 } from '@mui/material';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'; // Corrected: Import AdapterDateFns from the V3 path
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import AuthContext from '../../context/AuthContext';
-import { format, parseISO, formatISO, addMinutes } from 'date-fns'; // For date formatting, added addMinutes
+import { format, parseISO, formatISO, addMinutes, isSameDay } from 'date-fns'; // Added isSameDay
+import { EventAvailable as EventAvailableIcon, AccessTime as AccessTimeIcon, InfoOutlined as InfoIcon, EventBusy as EventBusyIcon } from '@mui/icons-material';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
 
 function FacilityAvailabilityPage() {
   const { facilityId } = useParams();
-  // const navigate = useNavigate(); // Was unused
   const { authState } = useContext(AuthContext);
+  const theme = useTheme();
 
   const [facility, setFacility] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -130,88 +131,130 @@ function FacilityAvailabilityPage() {
 
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+    <Container
+        maxWidth="lg" // Wider for better layout
+        sx={{
+            mt: 4,
+            mb: 4,
+            py: 3,
+            backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100],
+            borderRadius: 2
+        }}
+    >
       <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <Paper elevation={3} sx={{ p: { xs: 2, md: 4 } }}>
-          <Typography variant="h4" component="h1" gutterBottom color="primary">
-            {facility.name} - Book a Slot
+        <Paper elevation={4} sx={{ p: { xs: 2, md: 3 } }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <EventAvailableIcon color="primary" sx={{ fontSize: {xs:28, md:32}, mr: 1.5 }} />
+            <Typography variant="h4" component="h1" gutterBottom color="primary.main" sx={{mb:0}}>
+              {facility.name} - Book a Slot
+            </Typography>
+          </Box>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{mb:3}}>
+            {facility.description}
           </Typography>
-          <Typography variant="body1" color="textSecondary" paragraph>{facility.description}</Typography>
-          <Grid container spacing={3}>
+          <Divider sx={{mb:3}} />
+
+          <Grid container spacing={4}> {/* Increased spacing */}
             <Grid item xs={12} md={5}>
-              <Typography variant="h6" gutterBottom>Select Date</Typography>
+              <Typography variant="h6" gutterBottom sx={{mb: 2}}>Select Date</Typography>
               <DatePicker
                 label="Booking Date"
                 value={selectedDate}
                 onChange={handleDateChange}
-                minDate={new Date()} // Cannot select past dates
-                maxDate={addMinutes(new Date(), (facility.bookingLeadTimeDays || 7) * 24 * 60)} // Respect lead time
-                renderInput={(params) => <TextField {...params} fullWidth />}
+                minDate={new Date()}
+                maxDate={addMinutes(new Date(), (facility.bookingLeadTimeDays || 7) * 24 * 60)}
+                slotProps={{ textField: { fullWidth: true, variant: 'outlined' } }}
               />
-               <Box sx={{mt:2}}>
-                <Typography variant="caption">Type: <Chip label={facility.bookingType} size="small" /></Typography><br/>
-                <Typography variant="caption">Slot Duration: {facility.slotDurationMinutes} mins</Typography><br/>
-                <Typography variant="caption">Max {facility.maxBookingLengthSlots} consecutive slots</Typography>
+               <Box sx={{mt:2.5, p:1.5, border: `1px solid ${theme.palette.divider}`, borderRadius:1 }}>
+                <Typography variant="subtitle2" gutterBottom color="text.secondary">Facility Details:</Typography>
+                <List dense disablePadding>
+                    <ListItem disableGutters sx={{py:0.5}}>
+                        <ListItemIcon sx={{minWidth: 32}}><InfoIcon fontSize="small"/></ListItemIcon>
+                        <ListItemText primary="Type" secondary={facility.bookingType} />
+                    </ListItem>
+                    <ListItem disableGutters sx={{py:0.5}}>
+                        <ListItemIcon sx={{minWidth: 32}}><AccessTimeIcon fontSize="small"/></ListItemIcon>
+                        <ListItemText primary="Slot Duration" secondary={`${facility.slotDurationMinutes} minutes`} />
+                    </ListItem>
+                     <ListItem disableGutters sx={{py:0.5}}>
+                        <ListItemIcon sx={{minWidth: 32}}><AccessTimeIcon fontSize="small"/></ListItemIcon> {/* Could use a different icon */}
+                        <ListItemText primary="Max Slots/Booking" secondary={facility.maxBookingLengthSlots} />
+                    </ListItem>
+                </List>
               </Box>
             </Grid>
 
             <Grid item xs={12} md={7}>
               <Typography variant="h6" gutterBottom>
-                Available Slots for {format(selectedDate, 'PPP')} {/* PPP: Long date format */}
+                Available Slots for {format(selectedDate, 'PPP')}
               </Typography>
-              {error && <Alert severity="warning" sx={{ mb: 2 }}>{error}</Alert>} {/* Non-critical errors like no slots */}
+              {error && !loadingSlots && <Alert severity="warning" sx={{ mb: 2 }}>{error}</Alert>}
               {loadingSlots ? (
-                <CircularProgress />
+                <Box sx={{display: 'flex', justifyContent:'center', my:3}}><CircularProgress /></Box>
               ) : availableSlots.length > 0 ? (
-                <List dense sx={{ maxHeight: 300, overflow: 'auto', border: '1px solid lightgray', borderRadius: 1 }}>
-                  {availableSlots.map((slot, index) => (
-                    <React.Fragment key={index}>
-                      <ListItem
-                        button
+                <Paper variant="outlined" sx={{ maxHeight: 350, overflow: 'auto' }}>
+                  <List component="nav" aria-label="available time slots">
+                    {availableSlots.map((slot, index) => (
+                      <ListItemButton
+                        key={index}
                         selected={selectedSlot?.startTime.getTime() === slot.startTime.getTime()}
                         onClick={() => handleSlotSelection(slot)}
-                        disabled={new Date(slot.startTime) < new Date()} // Disable past slots on current day
+                        disabled={new Date(slot.startTime) < new Date() && !isSameDay(new Date(slot.startTime), new Date())} // More precise past slot disabling
+                        sx={{
+                            '&.Mui-selected': {
+                                backgroundColor: 'primary.light',
+                                color: 'primary.contrastText',
+                                '&:hover': {
+                                    backgroundColor: 'primary.main',
+                                }
+                            },
+                            '&.Mui-disabled': {
+                                opacity: 0.6,
+                            }
+                        }}
                       >
+                        <ListItemIcon sx={{color: selectedSlot?.startTime.getTime() === slot.startTime.getTime() ? 'primary.contrastText' : 'inherit'}}>
+                            <AccessTimeIcon />
+                        </ListItemIcon>
                         <ListItemText
                           primary={`${format(slot.startTime, 'p')} - ${format(slot.endTime, 'p')}`}
+                          primaryTypographyProps={{fontWeight: 'medium'}}
                         />
-                      </ListItem>
-                      {index < availableSlots.length - 1 && <Divider />}
-                    </React.Fragment>
-                  ))}
-                </List>
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </Paper>
               ) : (
-                <Typography>No available slots for this date.</Typography>
+                <Box sx={{display: 'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', p:3, border: `1px dashed ${theme.palette.divider}`, borderRadius: 1, mt:1}}>
+                    <EventBusyIcon sx={{fontSize: 40, color: 'text.secondary', mb:1}}/>
+                    <Typography color="text.secondary">No available slots for this date.</Typography>
+                </Box>
               )}
             </Grid>
           </Grid>
 
           {selectedSlot && (
-            <Box sx={{ mt: 3, p: 2, border: '1px dashed grey', borderRadius: 1, textAlign: 'center' }}>
-              <Typography variant="h6">Confirm Booking</Typography>
-              <Typography>
-                Facility: <strong>{facility.name}</strong>
-              </Typography>
-              <Typography>
-                Date: <strong>{format(selectedDate, 'PPP')}</strong>
-              </Typography>
-              <Typography>
-                Time: <strong>{format(selectedSlot.startTime, 'p')} - {format(selectedSlot.endTime, 'p')}</strong>
-              </Typography>
-              {/* Optional: Add notes field here if needed */}
+            <Paper elevation={2} sx={{ mt: 4, p: 2.5, textAlign: 'center', backgroundColor: theme.palette.action.selected }}>
+              <Typography variant="h6" gutterBottom color="primary.dark">Confirm Your Booking</Typography>
+              <List dense disablePadding sx={{mb:2}}>
+                <ListItemText primary="Facility:" secondary={<strong>{facility.name}</strong>} sx={{textAlign:'center', mb:0.5}}/>
+                <ListItemText primary="Date:" secondary={<strong>{format(selectedDate, 'PPP')}</strong>} sx={{textAlign:'center', mb:0.5}}/>
+                <ListItemText primary="Time:" secondary={<strong>{`${format(selectedSlot.startTime, 'p')} - ${format(selectedSlot.endTime, 'p')}`}</strong>} sx={{textAlign:'center'}}/>
+              </List>
               <Button
                 variant="contained"
-                color="primary"
+                color="secondary" // Changed to secondary for booking confirmation
                 onClick={handleBookingConfirm}
                 disabled={bookingLoading || !authState.isAuthenticated}
-                sx={{ mt: 2 }}
+                sx={{ mt: 1, px:4, py:1.2 }}
+                startIcon={bookingLoading ? <CircularProgress size={20} color="inherit"/> : null}
               >
-                {bookingLoading ? <CircularProgress size={24} /> : (authState.isAuthenticated ? 'Confirm Booking' : 'Login to Book')}
+                {authState.isAuthenticated ? 'Confirm & Book Slot' : 'Login to Book'}
               </Button>
-            </Box>
+            </Paper>
           )}
-          {bookingError && <Alert severity="error" sx={{ mt: 2 }}>{bookingError}</Alert>}
-          {bookingSuccess && <Alert severity="success" sx={{ mt: 2 }}>{bookingSuccess}</Alert>}
+          {bookingError && <Alert severity="error" sx={{ mt: 3 }}>{bookingError}</Alert>}
+          {bookingSuccess && <Alert severity="success" sx={{ mt: 3 }}>{bookingSuccess}</Alert>}
 
         </Paper>
       </LocalizationProvider>

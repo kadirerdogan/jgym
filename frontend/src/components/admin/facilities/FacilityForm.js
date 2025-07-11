@@ -4,9 +4,9 @@ import { useNavigate, useParams, Link as RouterLink } from 'react-router-dom';
 import {
   Container, Box, Typography, TextField, Button, CircularProgress, Alert,
   FormControlLabel, Checkbox, FormGroup, Paper, Grid, MenuItem, Select, InputLabel, FormControl,
-  IconButton, Divider, Chip // Added Chip
+  IconButton, Divider, Chip, useTheme, Tooltip // Added useTheme and Tooltip
 } from '@mui/material';
-import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
+import { AddCircleOutline, RemoveCircleOutline, EditNote as EditNoteIcon, AddBusiness as AddBusinessIcon } from '@mui/icons-material'; // Added form icons
 import AuthContext from '../../../context/AuthContext';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
@@ -20,6 +20,7 @@ function FacilityForm() {
   const isEditMode = Boolean(facilityId);
   const navigate = useNavigate();
   const { authState } = useContext(AuthContext);
+  const theme = useTheme();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -164,11 +165,24 @@ function FacilityForm() {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}> {/* Changed to lg for more space */}
-      <Paper elevation={3} sx={{ p: { xs: 2, md: 4 } }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          {isEditMode ? 'Edit Facility' : 'Create New Facility'}
-        </Typography>
+    <Container
+        maxWidth="lg"
+        sx={{
+            mt: 4,
+            mb: 4,
+            py: 3,
+            backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100],
+            borderRadius: 2
+        }}
+    >
+      <Paper elevation={4} sx={{ p: { xs: 2, md: 4 } }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            {isEditMode ? <EditNoteIcon color="primary" sx={{ fontSize: 32, mr: 1.5 }} /> : <AddBusinessIcon color="primary" sx={{ fontSize: 32, mr: 1.5 }} />}
+            <Typography variant="h4" component="h1" gutterBottom color="primary.main" sx={{mb:0}}>
+            {isEditMode ? 'Edit Facility' : 'Create New Facility'}
+            </Typography>
+        </Box>
+        <Divider sx={{mb: 3}}/>
 
         {formError && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setFormError('')}>{formError}</Alert>}
         {formSuccess && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setFormSuccess('')}>{formSuccess}</Alert>}
@@ -176,12 +190,12 @@ function FacilityForm() {
         <form onSubmit={handleSubmit}>
           <Grid container spacing={3}>
             {/* Basic Info Section */}
-            <Grid item xs={12}><Typography variant="h6">Basic Information</Typography></Grid>
+            <Grid item xs={12} sx={{pt: '16px !important'}}><Divider><Chip label="Basic Information" sx={{fontSize: '1rem', fontWeight:'medium'}} color="primary"/></Divider></Grid>
             <Grid item xs={12} md={6}>
-              <TextField name="name" label="Facility Name" value={formData.name} onChange={handleChange} fullWidth required disabled={loading} />
+              <TextField name="name" label="Facility Name" value={formData.name} onChange={handleChange} fullWidth required disabled={loading} variant="outlined" />
             </Grid>
             <Grid item xs={12} md={6}>
-              <FormControl fullWidth required disabled={loading}>
+              <FormControl fullWidth required disabled={loading} variant="outlined">
                 <InputLabel id="type-select-label">Type</InputLabel>
                 <Select labelId="type-select-label" name="type" value={formData.type} label="Type" onChange={handleChange}>
                   {FACILITY_TYPES.map(type => <MenuItem key={type} value={type}>{type}</MenuItem>)}
@@ -189,13 +203,13 @@ function FacilityForm() {
               </FormControl>
             </Grid>
             <Grid item xs={12}>
-              <TextField name="description" label="Description" value={formData.description} onChange={handleChange} fullWidth required multiline rows={3} disabled={loading} />
+              <TextField name="description" label="Description" value={formData.description} onChange={handleChange} fullWidth required multiline rows={3} disabled={loading} variant="outlined"/>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-              <TextField name="capacity" label="Capacity" type="number" value={formData.capacity} onChange={handleChange} fullWidth required InputProps={{ inputProps: { min: 0 } }} disabled={loading} />
+              <TextField name="capacity" label="Capacity" type="number" value={formData.capacity} onChange={handleChange} fullWidth required InputProps={{ inputProps: { min: 0 } }} disabled={loading} variant="outlined"/>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-              <FormControl fullWidth required disabled={loading}>
+              <FormControl fullWidth required disabled={loading} variant="outlined">
                 <InputLabel id="status-select-label">Status</InputLabel>
                 <Select labelId="status-select-label" name="status" value={formData.status} label="Status" onChange={handleChange}>
                   {FACILITY_STATUSES.map(status => <MenuItem key={status} value={status}>{status}</MenuItem>)}
@@ -203,18 +217,18 @@ function FacilityForm() {
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-              <FormGroup sx={{height: '100%', display: 'flex', justifyContent: 'center'}}>
+              <FormGroup sx={{height: '100%', display: 'flex', justifyContent: 'center', pl:1, border: '1px solid', borderColor: 'divider', borderRadius: 1}}>
                 <FormControlLabel control={<Checkbox name="isActive" checked={formData.isActive} onChange={handleChange} disabled={loading} />} label="Facility is Active" />
               </FormGroup>
             </Grid>
             <Grid item xs={12}>
-              <TextField name="notes" label="Additional Notes (optional)" value={formData.notes} onChange={handleChange} fullWidth multiline rows={2} disabled={loading}/>
+              <TextField name="notes" label="Additional Notes (optional)" value={formData.notes} onChange={handleChange} fullWidth multiline rows={2} disabled={loading} variant="outlined"/>
             </Grid>
 
             {/* Booking Configuration Section */}
-            <Grid item xs={12}><Divider sx={{my:2}}><Chip label="Booking Configuration" /></Divider></Grid>
+            <Grid item xs={12} sx={{pt: '32px !important'}}><Divider><Chip label="Booking Configuration" sx={{fontSize: '1rem', fontWeight:'medium'}} color="secondary"/></Divider></Grid>
             <Grid item xs={12} sm={6} md={4}>
-                <FormControl fullWidth required disabled={loading}>
+                <FormControl fullWidth required disabled={loading} variant="outlined">
                     <InputLabel id="bookingType-select-label">Booking Type</InputLabel>
                     <Select labelId="bookingType-select-label" name="bookingType" value={formData.bookingType} label="Booking Type" onChange={handleChange}>
                         {BOOKING_TYPES.map(type => <MenuItem key={type} value={type}>{type}</MenuItem>)}
@@ -222,21 +236,21 @@ function FacilityForm() {
                 </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-                <TextField name="slotDurationMinutes" label="Slot Duration (Minutes)" type="number" value={formData.slotDurationMinutes} onChange={handleChange} fullWidth required InputProps={{inputProps: {min: 15}}} disabled={loading} helperText="e.g., 60 for hourly bookings"/>
+                <TextField name="slotDurationMinutes" label="Slot Duration (Minutes)" type="number" value={formData.slotDurationMinutes} onChange={handleChange} fullWidth required InputProps={{inputProps: {min: 15}}} disabled={loading} helperText="e.g., 60 for hourly bookings" variant="outlined"/>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-                <TextField name="maxBookingLengthSlots" label="Max Booking Length (Slots)" type="number" value={formData.maxBookingLengthSlots} onChange={handleChange} fullWidth required InputProps={{inputProps: {min: 1}}} disabled={loading} helperText="Max consecutive slots per booking"/>
+                <TextField name="maxBookingLengthSlots" label="Max Booking Length (Slots)" type="number" value={formData.maxBookingLengthSlots} onChange={handleChange} fullWidth required InputProps={{inputProps: {min: 1}}} disabled={loading} helperText="Max consecutive slots per booking" variant="outlined"/>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-                <TextField name="bookingLeadTimeDays" label="Booking Lead Time (Days)" type="number" value={formData.bookingLeadTimeDays} onChange={handleChange} fullWidth required InputProps={{inputProps: {min: 0}}} disabled={loading} helperText="Days in advance bookings open (0 for same day)"/>
+                <TextField name="bookingLeadTimeDays" label="Booking Lead Time (Days)" type="number" value={formData.bookingLeadTimeDays} onChange={handleChange} fullWidth required InputProps={{inputProps: {min: 0}}} disabled={loading} helperText="Days in advance bookings open (0 for same day)" variant="outlined"/>
             </Grid>
 
             {/* Operating Hours Section */}
-            <Grid item xs={12}><Divider sx={{my:2}}><Chip label="Operating Hours" /></Divider></Grid>
+            <Grid item xs={12} sx={{pt: '32px !important'}}><Divider><Chip label="Operating Hours" sx={{fontSize: '1rem', fontWeight:'medium'}} color="secondary"/></Divider></Grid>
             {formData.operatingHours.map((oh, index) => (
                 <Grid item container spacing={2} xs={12} key={index} alignItems="center" sx={{mb:1}}>
                     <Grid item xs={12} sm={4} md={3}>
-                        <FormControl fullWidth required disabled={loading} size="small">
+                        <FormControl fullWidth required disabled={loading} size="small" variant="outlined">
                             <InputLabel>Day</InputLabel>
                             <Select name="dayOfWeek" value={oh.dayOfWeek} label="Day" onChange={(e) => handleOperatingHoursChange(index, 'dayOfWeek', e.target.value)}>
                                 {DAYS_OF_WEEK.map(day => <MenuItem key={day} value={day}>{day}</MenuItem>)}
@@ -244,15 +258,17 @@ function FacilityForm() {
                         </FormControl>
                     </Grid>
                     <Grid item xs={5} sm={3} md={3}>
-                        <TextField label="Open Time" type="time" name="openTime" value={oh.openTime} onChange={(e) => handleOperatingHoursChange(index, 'openTime', e.target.value)} fullWidth required InputLabelProps={{ shrink: true }} size="small" disabled={loading}/>
+                        <TextField label="Open Time" type="time" name="openTime" value={oh.openTime} onChange={(e) => handleOperatingHoursChange(index, 'openTime', e.target.value)} fullWidth required InputLabelProps={{ shrink: true }} size="small" disabled={loading} variant="outlined"/>
                     </Grid>
                     <Grid item xs={5} sm={3} md={3}>
-                        <TextField label="Close Time" type="time" name="closeTime" value={oh.closeTime} onChange={(e) => handleOperatingHoursChange(index, 'closeTime', e.target.value)} fullWidth required InputLabelProps={{ shrink: true }} size="small" disabled={loading}/>
+                        <TextField label="Close Time" type="time" name="closeTime" value={oh.closeTime} onChange={(e) => handleOperatingHoursChange(index, 'closeTime', e.target.value)} fullWidth required InputLabelProps={{ shrink: true }} size="small" disabled={loading} variant="outlined"/>
                     </Grid>
                     <Grid item xs={2} sm={2} md={3} sx={{textAlign: {xs: 'right', sm:'left'}}}>
-                        <IconButton onClick={() => removeOperatingHourSlot(index)} color="error" disabled={loading || formData.operatingHours.length === 0}>
-                            <RemoveCircleOutline />
-                        </IconButton>
+                        <Tooltip title="Remove Operating Slot">
+                            <IconButton onClick={() => removeOperatingHourSlot(index)} color="error" disabled={loading || formData.operatingHours.length === 0}>
+                                <RemoveCircleOutline />
+                            </IconButton>
+                        </Tooltip>
                     </Grid>
                 </Grid>
             ))}
@@ -262,8 +278,8 @@ function FacilityForm() {
 
 
             <Grid item xs={12} sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-              <Button variant="outlined" component={RouterLink} to="/admin/facilities" disabled={loading || initialLoading}>Cancel</Button>
-              <Button type="submit" variant="contained" color="primary" disabled={loading || initialLoading}>
+              <Button variant="outlined" component={RouterLink} to="/admin/facilities" disabled={loading || initialLoading} sx={{px:3, py:1}}>Cancel</Button>
+              <Button type="submit" variant="contained" color="primary" disabled={loading || initialLoading} sx={{px:3, py:1}}>
                 {loading ? <CircularProgress size={24} /> : (isEditMode ? 'Update Facility' : 'Create Facility')}
               </Button>
             </Grid>
