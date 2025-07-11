@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom'; // useNavigate removed
 import {
   Container, Box, Typography, CircularProgress, Alert, Paper, Grid, Button,
-  List, ListItem, ListItemText, Divider, TextField, Chip, useTheme, ListItemButton, ListItemIcon, ListSubheader
+  List, ListItem, ListItemText, Divider, useTheme, ListItemButton, ListItemIcon
+  // TextField, Chip, ListSubheader removed
 } from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';

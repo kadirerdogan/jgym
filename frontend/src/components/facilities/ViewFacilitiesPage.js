@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
   Container, Box, Typography, CircularProgress, Alert, Grid, Card, CardContent, CardActions, Button, Chip,
-  CardMedia, useTheme, ListItem, ListItemIcon, ListItemText, Icon // Added CardMedia, useTheme, and List components
+  CardMedia, useTheme, ListItem, ListItemIcon, ListItemText, Icon, Divider // Added Divider
 } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import {
